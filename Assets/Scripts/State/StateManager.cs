@@ -10,7 +10,6 @@ namespace Hexagon.State
         public enum State
         {
             EMPTY,
-            WAITING,
             ROTATING,
             DESTROYING,
             FILLING,

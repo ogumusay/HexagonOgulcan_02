@@ -9,12 +9,9 @@ namespace Hexagon.Board
     public class BoardSettings : ScriptableObject
     {
         [SerializeField]
-        public int Row, Column;
+        public float Row, Column;
 
         [SerializeField]
         public HexagonObject HexagonObjectPrefab;
-
-        [SerializeField]
-        public SelectableGameObjectColor[] Colors;
     }
 }
