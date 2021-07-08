@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Hexagon.State
 {
-    public class StateManager : ScriptableObject
+    public class StateManager
     {
         public enum State
         {
@@ -13,9 +13,10 @@ namespace Hexagon.State
             ROTATING,
             DESTROYING,
             FILLING,
-            CHECKING
+            CHECKING,
+            GAME_OVER
         }
 
-        public static State CurrentState;
+        public static State CurrentState = State.CHECKING;
     }
 }
