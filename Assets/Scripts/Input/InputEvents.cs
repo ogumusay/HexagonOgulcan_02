@@ -39,7 +39,6 @@ namespace Hexagon.UserInput
                 if ((_positionOnFirstTouch.x - camera.ScreenToWorldPoint(Input.mousePosition).x) < (-_inputData.SwipeDistance))
                 {
                     OnRightSwipe?.Invoke();
-                    Debug.Log("right");
                 }
             }
         }
@@ -51,7 +50,6 @@ namespace Hexagon.UserInput
                 if ((_positionOnFirstTouch.x - camera.ScreenToWorldPoint(Input.mousePosition).x) > _inputData.SwipeDistance)
                 {
                     OnLeftSwipe?.Invoke();
-                    Debug.Log("left");
                 }
             }
         }
