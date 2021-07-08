@@ -9,10 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e89990f05a9fdc244b9f5d282885da6b, type: 3}
-  m_Name: BoardSettings
+  m_Script: {fileID: 11500000, guid: fecd07b6068b9b1489243d28d3a7b33e, type: 3}
+  m_Name: SelectableGameObjectData_Hexagon
   m_EditorClassIdentifier: 
-  Row: 9
-  Column: 8
-  HexagonObjectPrefab: {fileID: 8471155379615840258, guid: a7aceb3ab538e4a4aaddbac5c8b43acc, type: 3}
-  Colors: 0000000001000000020000000300000004000000
