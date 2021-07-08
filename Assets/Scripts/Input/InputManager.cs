@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Hexagon.State;
 
 
 namespace Hexagon.UserInput
@@ -19,7 +20,10 @@ namespace Hexagon.UserInput
 
         private void Update() 
         {
-            _inputEvents.ProcessInput(_cameraMain);
+            if (StateManager.CurrentState == StateManager.State.EMPTY)
+            {
+                _inputEvents.ProcessInput(_cameraMain);                
+            }
         }
     }
 }
