@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Hexagon.State;
 
 namespace Hexagon.GameObjects
 {
@@ -21,7 +22,10 @@ namespace Hexagon.GameObjects
 
         private void OnMouseUp() 
         {
-            _onMouseUp?.Invoke();
+            if (StateManager.CurrentState == StateManager.State.EMPTY)
+            {
+                _onMouseUp?.Invoke();                
+            }
         }
         
         private void OnDestroy() 
