@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Hexagon.GameObjects;
 using Hexagon.State;
+using Hexagon.UserInput;
 using System.Linq;
+using System;
 
 
 namespace Hexagon.Board
@@ -15,11 +17,13 @@ namespace Hexagon.Board
 
         private GameObject _hexagonContainer, _hexagonBombContainer;
 
-        //private List<AbstractSelectableGameObject> gameObjectList = new List<AbstractSelectableGameObject>();
-        //public static List<AbstractSelectableGameObject> GameObjectsToDestroy = new List<AbstractSelectableGameObject>();
+        public static event Action OnGameOver;
 
         private void Awake()
         {
+            InputEvents.OnRightSwipe += StartCoroutineRotateClockwise;
+            InputEvents.OnLeftSwipe += StartCoroutineRotateAntiClockwise;
+
             CreateGameObjects(_boardSettings.Row, _boardSettings.Column);
         }
 
@@ -95,12 +99,38 @@ namespace Hexagon.Board
                 //After destroy them, fill the empty spaces
                 yield return FillTheEmptySpaces();
             }
+            else
+            {
+                //If no possible move left in game, end the game
+                if (PossibleMoveLeft())
+                {
+                    StateManager.CurrentState = StateManager.State.EMPTY;
+                }
+                else
+                {
+                    yield return new WaitForSeconds(0.3f);
+
+                    OnGameOver?.Invoke();
+                }
+            }
 
         }
+
+
 
         public void DestroyGameObjects()
         {
             StateManager.CurrentState = StateManager.State.DESTROYING;
+
+            if (_boardSettings.SelectedGameObjects.Count > 0)
+            {
+                foreach (var hexagon in _boardSettings.SelectedGameObjects)
+                {
+                    hexagon.SetColor();
+                }
+
+                _boardSettings.SelectedGameObjects.Clear();
+            }
 
             //Remove destroyed ones and show VFX
             foreach (var gameObject in _boardSettings.GameObjectsToDestroy)
@@ -173,9 +203,229 @@ namespace Hexagon.Board
             yield return FindAllMatches();
         }
 
+        private IEnumerator RotateClockwise()
+        {
+            if (_boardSettings.SelectedGameObjects.Count > 0 && StateManager.CurrentState == StateManager.State.EMPTY)
+            {
+                StateManager.CurrentState = StateManager.State.ROTATING;
+
+                for (int i = 0; i < 3; i++)
+                {
+                    Vector2 tempGridPos = _boardSettings.SelectedGameObjects[0].PositionOnGrid;
+
+                    _boardSettings.SelectedGameObjects[0].PositionOnGrid = _boardSettings.SelectedGameObjects[1].PositionOnGrid;
+                    _boardSettings.SelectedGameObjects[1].PositionOnGrid = _boardSettings.SelectedGameObjects[2].PositionOnGrid;
+                    _boardSettings.SelectedGameObjects[2].PositionOnGrid = tempGridPos;
+
+                    yield return new WaitForSeconds(0.3f);
+
+                    //Check every rotation if there is 3 or more same color hexagon
+                    foreach (var hex in _boardSettings.SelectedGameObjects)
+                    {
+                        hex.SendRays();
+                    }
+
+
+                    //if there is 3 or more same color hexagon
+                    if (_boardSettings.GameObjectsToDestroy.Count > 0)
+                    {
+                        yield return new WaitForSeconds(0.7f);
+
+                        DestroyGameObjects();
+
+                        yield return new WaitForSeconds(0.3f);
+
+                        //If there is 'hexagon bomb' on board, decrease its countdown
+                        if (_hexagonBombContainer.transform.childCount > 0)
+                        {
+                            foreach (Transform bomb in _hexagonBombContainer.transform)
+                            {
+                                bomb.GetComponent<HexagonBombObject>().CountDown();
+                            }
+                        }
+
+                        StartCoroutine(FillTheEmptySpaces());
+
+                        //Destroyed same color hexagons, dont rotate anymore
+                        break;
+                    }
+                }
+
+                StateManager.CurrentState = StateManager.State.EMPTY;
+            }
+        }
+
+        private IEnumerator RotateAntiClockwise()
+        {
+            if (_boardSettings.SelectedGameObjects.Count > 0 && StateManager.CurrentState == StateManager.State.EMPTY)
+            {
+                StateManager.CurrentState = StateManager.State.ROTATING;
+
+                for (int i = 0; i < 3; i++)
+                {
+                    Vector2 tempGridPos = _boardSettings.SelectedGameObjects[0].PositionOnGrid;
+
+                    _boardSettings.SelectedGameObjects[0].PositionOnGrid = _boardSettings.SelectedGameObjects[2].PositionOnGrid;
+                    _boardSettings.SelectedGameObjects[2].PositionOnGrid = _boardSettings.SelectedGameObjects[1].PositionOnGrid;
+                    _boardSettings.SelectedGameObjects[1].PositionOnGrid = tempGridPos;
+
+                    yield return new WaitForSeconds(0.3f);
+
+                    //Check every rotation if there is 3 or more same color hexagon
+                    foreach (var hex in _boardSettings.SelectedGameObjects)
+                    {
+                        hex.SendRays();
+                    }
+
+
+                    //if there is 3 or more same color hexagon
+                    if (_boardSettings.GameObjectsToDestroy.Count > 0)
+                    {
+                        yield return new WaitForSeconds(0.7f);
+
+                        DestroyGameObjects();
+
+                        yield return new WaitForSeconds(0.3f);
+
+                        //If there is 'hexagon bomb' on board, decrease its countdown
+                        if (_hexagonBombContainer.transform.childCount > 0)
+                        {
+                            foreach (Transform bomb in _hexagonBombContainer.transform)
+                            {
+                                bomb.GetComponent<HexagonBombObject>().CountDown();
+                            }
+                        }
+
+                        StartCoroutine(FillTheEmptySpaces());
+
+                        //Destroyed same color hexagons, dont rotate anymore
+                        break;
+                    }
+                }
+
+                StateManager.CurrentState = StateManager.State.EMPTY;
+            }
+        }
+
+        private void StartCoroutineRotateClockwise()
+        {
+            StartCoroutine(RotateClockwise());
+        }
+
+        private void StartCoroutineRotateAntiClockwise()
+        {
+            StartCoroutine(RotateAntiClockwise());
+        }
+
         private void OnDestroy()
         {
+            InputEvents.OnRightSwipe -= StartCoroutineRotateClockwise;
+            InputEvents.OnLeftSwipe -= StartCoroutineRotateAntiClockwise;
+
             _boardSettings.ClearLists();
         }
+
+        /*  ->Go to every hexagon on board
+                    ->Find 6 adjacent hexagons of current hexagon
+                        ->If there is one in 6 hexagons, with same color as the current hexagon, find joint hexagons of these two
+                            ->Find joint hexagons' 6 adjacent hexagons
+                                ->If there is same color hexagon in 6 hexagons, as the current hexagon RETURN TRUE       
+                -> RETURN FALSE 
+
+            */
+        private bool PossibleMoveLeft()
+        {
+            for (int i = 1; i <= _boardSettings.Column; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    for (int j = 2; j <= _boardSettings.Row * 2; j = j + 2)
+                    {
+                        AbstractSelectableGameObject centerHexagon = _boardSettings.GameObjectList.Where(hex => hex.PositionOnGrid == new Vector2(i, j)).FirstOrDefault();
+
+                        foreach (var grid in _boardSettings.FindAdjacentHexagons(new Vector2(i, j)))
+                        {
+                            AbstractSelectableGameObject otherHexagon = _boardSettings.GameObjectList.Where(hex => hex.PositionOnGrid == grid).FirstOrDefault();
+
+                            if (otherHexagon.Color == centerHexagon.Color)
+                            {
+                                foreach (var sharedHex in
+                                        _boardSettings.FindSharedHexagons(centerHexagon.PositionOnGrid, otherHexagon.PositionOnGrid))
+                                {
+
+                                    foreach (var hexGrid in _boardSettings.FindAdjacentHexagons(sharedHex))
+                                    {
+                                        if (hexGrid == centerHexagon.PositionOnGrid || hexGrid == otherHexagon.PositionOnGrid)
+                                        {
+                                            continue;
+                                        }
+
+                                        AbstractSelectableGameObject hex = _boardSettings.GameObjectList.Where(hex => hex.PositionOnGrid == hexGrid).
+                                                        FirstOrDefault();
+
+                                        if (hex != null)
+                                        {
+                                            if (hex.Color == centerHexagon.Color)
+                                            {
+                                                return true;
+                                            }
+
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+
+                    }
+                }
+                else
+                {
+                    for (int j = 1; j <= (_boardSettings.Row * 2) - 1; j = j + 2)
+                    {
+
+                        AbstractSelectableGameObject centerHexagon = _boardSettings.GameObjectList.Where(hex => hex.PositionOnGrid == new Vector2(i, j)).FirstOrDefault();
+                        List<AbstractSelectableGameObject> adjacentHexagons = new List<AbstractSelectableGameObject>();
+
+                        foreach (var grid in _boardSettings.FindAdjacentHexagons(new Vector2(i, j)))
+                        {
+                            AbstractSelectableGameObject otherHexagon = _boardSettings.GameObjectList.Where(hex => hex.PositionOnGrid == grid).FirstOrDefault();
+
+                            if (otherHexagon.Color == centerHexagon.Color)
+                            {
+                                foreach (var sharedHex in
+                                        _boardSettings.FindSharedHexagons(centerHexagon.PositionOnGrid, otherHexagon.PositionOnGrid))
+                                {
+
+                                    foreach (var hexGrid in _boardSettings.FindAdjacentHexagons(sharedHex))
+                                    {
+                                        if (hexGrid == centerHexagon.PositionOnGrid || hexGrid == otherHexagon.PositionOnGrid)
+                                        {
+                                            continue;
+                                        }
+
+                                        AbstractSelectableGameObject hex = _boardSettings.GameObjectList.Where(hex => hex.PositionOnGrid == hexGrid).
+                                                        FirstOrDefault();
+
+                                        if (hex != null)
+                                        {
+                                            if (hex.Color == centerHexagon.Color)
+                                            {
+                                                return true;
+                                            }
+
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
     }
 }

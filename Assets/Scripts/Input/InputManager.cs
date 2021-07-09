@@ -25,5 +25,6 @@ namespace Hexagon.UserInput
                 _inputEvents.ProcessInput(_cameraMain);                
             }
         }
+
     }
 }

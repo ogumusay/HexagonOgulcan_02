@@ -20,7 +20,7 @@ namespace Hexagon.GameObjects
         private delegate void ClickEvent(Vector2[] positions);
         private event ClickEvent onMouseUp;
 
-        private void Awake()
+        protected virtual void Awake()
         {
             onMouseUp += SelectAdjacentObjects;
         }
@@ -204,7 +204,7 @@ namespace Hexagon.GameObjects
 
         private void OnMouseUp()
         {
-            if (true/*StateManager.CurrentState == StateManager.State.EMPTY*/)
+            if (StateManager.CurrentState == StateManager.State.EMPTY)
             {
                 onMouseUp?.Invoke(FindGridPositionsOfAdjacentObjects());
             }

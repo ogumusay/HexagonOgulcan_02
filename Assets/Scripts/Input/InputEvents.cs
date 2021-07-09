@@ -14,6 +14,8 @@ namespace Hexagon.UserInput
 
         private Vector3 _positionOnFirstTouch;
     
+        public delegate IEnumerator InputEvent();
+
         public static event Action OnRightSwipe; 
         public static event Action OnLeftSwipe; 
 
