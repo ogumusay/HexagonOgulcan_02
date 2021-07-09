@@ -15,8 +15,8 @@ namespace Hexagon.Board
 
         private GameObject _hexagonContainer, _hexagonBombContainer;
 
-        private List<AbstractSelectableGameObject> gameObjectList = new List<AbstractSelectableGameObject>();
-        public static List<AbstractSelectableGameObject> GameObjectsToDestroy = new List<AbstractSelectableGameObject>();
+        //private List<AbstractSelectableGameObject> gameObjectList = new List<AbstractSelectableGameObject>();
+        //public static List<AbstractSelectableGameObject> GameObjectsToDestroy = new List<AbstractSelectableGameObject>();
 
         private void Awake()
         {
@@ -44,7 +44,7 @@ namespace Hexagon.Board
                         hexagon.transform.position = hexagon.GridToWorldPosition();
                         hexagon.transform.parent = _hexagonContainer.transform;
 
-                        gameObjectList.Add(hexagon);
+                        _boardSettings.GameObjectList.Add(hexagon);
                     }
                 }
                 else
@@ -59,7 +59,7 @@ namespace Hexagon.Board
                         hexagon.transform.position = hexagon.GridToWorldPosition();
                         hexagon.transform.parent = _hexagonContainer.transform;
 
-                        gameObjectList.Add(hexagon);
+                        _boardSettings.GameObjectList.Add(hexagon);
                     }
                 }
             }
@@ -69,7 +69,7 @@ namespace Hexagon.Board
         {
             StateManager.CurrentState = StateManager.State.WAITING;
 
-            yield return new WaitForSeconds(0.8f);
+            yield return new WaitForSeconds(_boardSettings.StartDelay);
 
             StartCoroutine(FindAllMatches());
         }
@@ -80,13 +80,13 @@ namespace Hexagon.Board
             StateManager.CurrentState = StateManager.State.CHECKING;
 
             //Every hex in board send rays to check same color hexagons nearby
-            foreach (var gameObject in gameObjectList)
+            foreach (var gameObject in _boardSettings.GameObjectList)
             {
                 gameObject.SendRays();
             }
 
             //If 3 or more hexagons to destroy, destroy them
-            if (GameObjectsToDestroy.Count > 2)
+            if (_boardSettings.GameObjectsToDestroy.Count > 2)
             {
                 DestroyGameObjects();
 
@@ -103,9 +103,9 @@ namespace Hexagon.Board
             StateManager.CurrentState = StateManager.State.DESTROYING;
 
             //Remove destroyed ones and show VFX
-            foreach (var gameObject in GameObjectsToDestroy)
+            foreach (var gameObject in _boardSettings.GameObjectsToDestroy)
             {
-                gameObjectList.Remove(gameObject);
+                _boardSettings.GameObjectList.Remove(gameObject);
 
                 Destroy(gameObject.gameObject, 0.1f);
             }
@@ -122,12 +122,12 @@ namespace Hexagon.Board
              */
             for (int i = 1; i <= _boardSettings.Column; i++)
             {
-                List<AbstractSelectableGameObject> objectList = gameObjectList.Where(gameObject => gameObject.PositionOnGrid.x == i).ToList();
+                List<AbstractSelectableGameObject> objectList = _boardSettings.GameObjectList.Where(gameObject => gameObject.PositionOnGrid.x == i).ToList();
 
                 foreach (var gameObject in objectList)
                 {
                     List<Vector2> emptyGrids =
-                        GameObjectsToDestroy.Where(grid => grid.PositionOnGrid.x == i & grid.PositionOnGrid.y < gameObject.PositionOnGrid.y)
+                        _boardSettings.GameObjectsToDestroy.Where(grid => grid.PositionOnGrid.x == i & grid.PositionOnGrid.y < gameObject.PositionOnGrid.y)
                                             .Select(grid => grid.PositionOnGrid).ToList();
 
                     if (emptyGrids.Count > 0)
@@ -141,7 +141,7 @@ namespace Hexagon.Board
             //Create new hexagons above shifted ones
             for (int i = 1; i <= _boardSettings.Column; i++)
             {
-                List<AbstractSelectableGameObject> emptySpacesByColumns = GameObjectsToDestroy.Where(hex => hex.PositionOnGrid.x == i).ToList();
+                List<AbstractSelectableGameObject> emptySpacesByColumns = _boardSettings.GameObjectsToDestroy.Where(hex => hex.PositionOnGrid.x == i).ToList();
 
                 if (emptySpacesByColumns.Count > 0)
                 {
@@ -158,7 +158,7 @@ namespace Hexagon.Board
                         newGameObject.SetRandomColor(_boardSettings.Colors);
                         newGameObject.transform.parent = _hexagonContainer.transform;
 
-                        gameObjectList.Add(newGameObject);
+                        _boardSettings.GameObjectList.Add(newGameObject);
 
                         newRow -= 2;
                     }
@@ -166,11 +166,16 @@ namespace Hexagon.Board
 
             }
 
-            GameObjectsToDestroy.Clear();
+            _boardSettings.GameObjectsToDestroy.Clear();
 
             yield return new WaitForSeconds(1f);
 
             yield return FindAllMatches();
+        }
+
+        private void OnDestroy()
+        {
+            _boardSettings.ClearLists();
         }
     }
 }

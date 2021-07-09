@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,6 +10,7 @@ namespace Hexagon.GameObjects
 {
     public abstract class AbstractSelectableGameObject : MonoBehaviour, ISelectable
     {
+        [SerializeField] protected BoardSettings _boardSettings;
         [SerializeField] protected SelectableGameObjectData _selectableGameObjectData;
         [SerializeField] private SpriteRenderer _spriteRenderer;
 
@@ -65,17 +67,138 @@ namespace Hexagon.GameObjects
             int randomNumber = UnityEngine.Random.Range(0, colors.Length);
             Color = colors[randomNumber];
 
+            SetColor();
+        }
+
+        public void SetColor()
+        {
             _spriteRenderer.color = _selectableGameObjectData.GetColor(Color);
         }
 
         public virtual void SelectObject()
         {
+            //Finding angle between 'center of hexagon' and 'mouse position'
+            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector3 mousePos = new Vector3(mouseWorldPos.x, mouseWorldPos.y, 0f);
+            Vector3 vectorBetweenMouseAndHex = mousePos - transform.position;
 
+            float angle = Vector3.SignedAngle(transform.up, vectorBetweenMouseAndHex, Vector3.forward);
+
+            //
+            //RIGHT CORNER
+            //
+            if (angle > -120f && angle < -60f &&
+                    PositionOnGrid.y > 1 && PositionOnGrid.x < _boardSettings.Column && PositionOnGrid.y < _boardSettings.Row * 2)
+            {
+                Vector2[] adjacentHexagons = {new Vector2(PositionOnGrid.x + 1, PositionOnGrid.y + 1),
+                                            new Vector2(PositionOnGrid.x + 1, PositionOnGrid.y - 1),
+                                                PositionOnGrid};
+
+                SelectHexagons(adjacentHexagons);
+            }
+            //
+            //BOTTOM RIGHT CORNER
+            //
+            else if (angle > -180f && angle < -120f &&
+                        PositionOnGrid.y > 2 && PositionOnGrid.x < _boardSettings.Column)
+            {
+                Vector2[] adjacentHexagons = {new Vector2(PositionOnGrid.x + 1, PositionOnGrid.y - 1),
+                                            new Vector2(PositionOnGrid.x, PositionOnGrid.y - 2),
+                                                PositionOnGrid};
+
+                SelectHexagons(adjacentHexagons);
+            }
+            //
+            //BOTTOM LEFT CORNER
+            //
+            else if (angle < 180f && angle > 120f &&
+                        PositionOnGrid.x > 1 && PositionOnGrid.y > 2)
+            {
+                Vector2[] adjacentHexagons = {new Vector2(PositionOnGrid.x, PositionOnGrid.y - 2),
+                                            new Vector2(PositionOnGrid.x - 1, PositionOnGrid.y - 1),
+                                                PositionOnGrid};
+
+                SelectHexagons(adjacentHexagons);
+            }
+            //
+            //LEFT CORNER
+            //     
+            else if (angle < 120f && angle > 60f &&
+                        PositionOnGrid.x > 1 && PositionOnGrid.y > 1 && PositionOnGrid.y < _boardSettings.Row * 2)
+            {
+                Vector2[] adjacentHexagons = {new Vector2(PositionOnGrid.x - 1, PositionOnGrid.y - 1),
+                                            new Vector2(PositionOnGrid.x - 1, PositionOnGrid.y + 1),
+                                                PositionOnGrid};
+
+                SelectHexagons(adjacentHexagons);
+            }
+            //
+            //TOP LEFT CORNER
+            //         
+            else if (angle < 60f && angle > 0f &&
+                        PositionOnGrid.x > 1 && PositionOnGrid.y + 1 < _boardSettings.Row * 2)
+            {
+                Vector2[] adjacentHexagons = {new Vector2(PositionOnGrid.x - 1, PositionOnGrid.y + 1),
+                                            new Vector2(PositionOnGrid.x, PositionOnGrid.y + 2),
+                                                PositionOnGrid};
+
+                SelectHexagons(adjacentHexagons);
+            }
+            //
+            //TOP RIGHT CORNER
+            // 
+            else if (angle < 0f && angle > -60f &&
+                        PositionOnGrid.x < _boardSettings.Column && PositionOnGrid.y + 1 < _boardSettings.Row * 2)
+            {
+                Vector2[] adjacentHexagons = {new Vector2(PositionOnGrid.x, PositionOnGrid.y + 2),
+                                            new Vector2(PositionOnGrid.x + 1, PositionOnGrid.y + 1),
+                                                PositionOnGrid};
+
+                SelectHexagons(adjacentHexagons);
+            }
+        }
+
+        public void SelectHexagons(Vector2[] positions)
+        {
+            //If there is already selected hexagons, remove them from list
+            if (_boardSettings.SelectedGameObjects.Count > 0)
+            {
+                foreach (var gameObject in _boardSettings.SelectedGameObjects)
+                {
+                    //Reset color of hexagon
+                    if (gameObject != null)
+                    {
+                        gameObject.SetColor();
+                    }
+                }
+
+                _boardSettings.SelectedGameObjects.Clear();
+            }
+
+            //Add hexagons that found by gridPosition to 'selectedHexagons' list
+            foreach (var position in positions)
+            {
+                AbstractSelectableGameObject hexagon = _boardSettings.GameObjectList.Where(hex => hex.PositionOnGrid == position).FirstOrDefault();
+
+                _boardSettings.SelectedGameObjects.Add(hexagon);
+            }
+
+            //Make selected hexagons more visible
+            foreach (var hex in _boardSettings.SelectedGameObjects)
+            {
+                hex.MakeHighlighted();
+            }
+
+        }
+
+        public void MakeHighlighted()
+        {
+            _spriteRenderer.color += new Color(0.2f, 0.2f, 0.2f, 1f);
         }
 
         private void OnMouseUp()
         {
-            if (StateManager.CurrentState == StateManager.State.EMPTY)
+            if (true/*StateManager.CurrentState == StateManager.State.EMPTY*/)
             {
                 onMouseUp?.Invoke();
             }
@@ -132,9 +255,9 @@ namespace Hexagon.GameObjects
             {
                 foreach (var gameObject in sameColorGameObjects)
                 {
-                    if (!BoardManager.GameObjectsToDestroy.Contains(gameObject))
+                    if (!_boardSettings.GameObjectsToDestroy.Contains(gameObject))
                     {
-                        BoardManager.GameObjectsToDestroy.Add(gameObject);
+                        _boardSettings.GameObjectsToDestroy.Add(gameObject);
                     }
                 }
             }
