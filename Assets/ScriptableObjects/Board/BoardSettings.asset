@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e89990f05a9fdc244b9f5d282885da6b, type: 3}
   m_Name: BoardSettings
   m_EditorClassIdentifier: 
-  Row: 4
-  Column: 3
+  Row: 9
+  Column: 8
   StartDelay: 0.8
   HexagonObjectPrefab: {fileID: 8471155379615840258, guid: a7aceb3ab538e4a4aaddbac5c8b43acc, type: 3}
-  Colors: 00000000010000000200000003000000040000000500000006000000
+  HexagonBombObjectPrefab: {fileID: 6237629015460650016, guid: 69e95ffffdd94a94d8c435e7d5133242, type: 3}
+  Colors: 0000000001000000020000000300000004000000
   GameObjectList: []
   GameObjectsToDestroy: []
   SelectedGameObjects: []

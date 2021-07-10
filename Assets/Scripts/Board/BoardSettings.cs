@@ -9,14 +9,21 @@ namespace Hexagon.Board
     [CreateAssetMenu(menuName = "Hexagon/Board/BoardSettings")]
     public class BoardSettings : ScriptableObject
     {
+        [Header("Size")]
         [SerializeField]
-        public int Row, Column;
+        public int Row;
+        [SerializeField]
+        public int Column;
 
+        [Header("Timing")]
         [SerializeField]
         public float StartDelay;
 
+        [Header("Prefabs")]
         [SerializeField]
-        public HexagonObject HexagonObjectPrefab;
+        public AbstractSelectableGameObject HexagonObjectPrefab;
+        [SerializeField]
+        public AbstractSelectableGameObject HexagonBombObjectPrefab;
 
         [SerializeField]
         public SelectableGameObjectColor[] Colors;

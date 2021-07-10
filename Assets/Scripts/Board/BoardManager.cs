@@ -21,8 +21,7 @@ namespace Hexagon.Board
 
         private void Awake()
         {
-            InputEvents.OnRightSwipe += StartCoroutineRotateClockwise;
-            InputEvents.OnLeftSwipe += StartCoroutineRotateAntiClockwise;
+            InputEvents.OnSwipe += StartCoroutineRotate;
 
             CreateGameObjects(_boardSettings.Row, _boardSettings.Column);
         }
@@ -111,7 +110,7 @@ namespace Hexagon.Board
                     StateManager.CurrentState = StateManager.State.GAME_OVER;
 
                     yield return new WaitForSeconds(0.3f);
-                    
+
                     OnNoMoveLeft?.Invoke();
                 }
             }
@@ -203,7 +202,7 @@ namespace Hexagon.Board
             yield return FindAllMatches();
         }
 
-        private IEnumerator RotateClockwise()
+        private IEnumerator Rotate(bool isClockwise)
         {
             if (_boardSettings.SelectedGameObjects.Count > 0 && StateManager.CurrentState == StateManager.State.EMPTY)
             {
@@ -213,9 +212,18 @@ namespace Hexagon.Board
                 {
                     Vector2 tempGridPos = _boardSettings.SelectedGameObjects[0].PositionOnGrid;
 
-                    _boardSettings.SelectedGameObjects[0].PositionOnGrid = _boardSettings.SelectedGameObjects[1].PositionOnGrid;
-                    _boardSettings.SelectedGameObjects[1].PositionOnGrid = _boardSettings.SelectedGameObjects[2].PositionOnGrid;
-                    _boardSettings.SelectedGameObjects[2].PositionOnGrid = tempGridPos;
+                    if (isClockwise)
+                    {
+                        _boardSettings.SelectedGameObjects[0].PositionOnGrid = _boardSettings.SelectedGameObjects[1].PositionOnGrid;
+                        _boardSettings.SelectedGameObjects[1].PositionOnGrid = _boardSettings.SelectedGameObjects[2].PositionOnGrid;
+                        _boardSettings.SelectedGameObjects[2].PositionOnGrid = tempGridPos;
+                    }
+                    else
+                    {
+                        _boardSettings.SelectedGameObjects[0].PositionOnGrid = _boardSettings.SelectedGameObjects[2].PositionOnGrid;
+                        _boardSettings.SelectedGameObjects[2].PositionOnGrid = _boardSettings.SelectedGameObjects[1].PositionOnGrid;
+                        _boardSettings.SelectedGameObjects[1].PositionOnGrid = tempGridPos;
+                    }
 
                     yield return new WaitForSeconds(0.3f);
 
@@ -255,72 +263,14 @@ namespace Hexagon.Board
             }
         }
 
-        private IEnumerator RotateAntiClockwise()
+        private void StartCoroutineRotate(bool isClockwise)
         {
-            if (_boardSettings.SelectedGameObjects.Count > 0 && StateManager.CurrentState == StateManager.State.EMPTY)
-            {
-                StateManager.CurrentState = StateManager.State.ROTATING;
-
-                for (int i = 0; i < 3; i++)
-                {
-                    Vector2 tempGridPos = _boardSettings.SelectedGameObjects[0].PositionOnGrid;
-
-                    _boardSettings.SelectedGameObjects[0].PositionOnGrid = _boardSettings.SelectedGameObjects[2].PositionOnGrid;
-                    _boardSettings.SelectedGameObjects[2].PositionOnGrid = _boardSettings.SelectedGameObjects[1].PositionOnGrid;
-                    _boardSettings.SelectedGameObjects[1].PositionOnGrid = tempGridPos;
-
-                    yield return new WaitForSeconds(0.3f);
-
-                    //Check every rotation if there is 3 or more same color hexagon
-                    foreach (var hex in _boardSettings.SelectedGameObjects)
-                    {
-                        hex.SendRays();
-                    }
-
-
-                    //if there is 3 or more same color hexagon
-                    if (_boardSettings.GameObjectsToDestroy.Count > 0)
-                    {
-                        yield return new WaitForSeconds(0.7f);
-
-                        DestroyGameObjects();
-
-                        yield return new WaitForSeconds(0.3f);
-
-                        //If there is 'hexagon bomb' on board, decrease its countdown
-                        if (_hexagonBombContainer.transform.childCount > 0)
-                        {
-                            foreach (Transform bomb in _hexagonBombContainer.transform)
-                            {
-                                bomb.GetComponent<HexagonBombObject>().CountDown();
-                            }
-                        }
-
-                        StartCoroutine(FillTheEmptySpaces());
-
-                        //Destroyed same color hexagons, dont rotate anymore
-                        break;
-                    }
-                }
-
-                StateManager.CurrentState = StateManager.State.EMPTY;
-            }
-        }
-
-        private void StartCoroutineRotateClockwise()
-        {
-            StartCoroutine(RotateClockwise());
-        }
-
-        private void StartCoroutineRotateAntiClockwise()
-        {
-            StartCoroutine(RotateAntiClockwise());
+            StartCoroutine(Rotate(isClockwise));
         }
 
         private void OnDestroy()
         {
-            InputEvents.OnRightSwipe -= StartCoroutineRotateClockwise;
-            InputEvents.OnLeftSwipe -= StartCoroutineRotateAntiClockwise;
+            InputEvents.OnSwipe -= StartCoroutineRotate;
 
             _boardSettings.ClearLists();
         }

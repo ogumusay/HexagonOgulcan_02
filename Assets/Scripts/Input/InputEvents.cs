@@ -14,10 +14,9 @@ namespace Hexagon.UserInput
 
         private Vector3 _positionOnFirstTouch;
     
-        public delegate IEnumerator InputEvent();
+        public delegate void InputEvent(bool isClockwise);
 
-        public static event Action OnRightSwipe; 
-        public static event Action OnLeftSwipe; 
+        public static event InputEvent OnSwipe; 
 
         public void ProcessInput(Camera camera)
         {
@@ -40,7 +39,7 @@ namespace Hexagon.UserInput
             {
                 if ((_positionOnFirstTouch.x - camera.ScreenToWorldPoint(Input.mousePosition).x) < (-_inputData.SwipeDistance))
                 {
-                    OnRightSwipe?.Invoke();
+                    OnSwipe?.Invoke(true);
                 }
             }
         }
@@ -51,7 +50,7 @@ namespace Hexagon.UserInput
             {
                 if ((_positionOnFirstTouch.x - camera.ScreenToWorldPoint(Input.mousePosition).x) > _inputData.SwipeDistance)
                 {
-                    OnLeftSwipe?.Invoke();
+                    OnSwipe?.Invoke(false);
                 }
             }
         }
