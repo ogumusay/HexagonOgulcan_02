@@ -25,6 +25,9 @@ namespace Hexagon.GameObjects
         [SerializeField]
         public int ScoreValue;
 
+        [SerializeField]
+        public ParticleSystem DestroyParticlePrefab;
+
         public Vector3[,] Corners = {/* TOP RIGHT CORNER */
                                     {Vector3.up, (Vector3.right * 1.73f + Vector3.up).normalized},
                                     /* RIGHT CORNER */

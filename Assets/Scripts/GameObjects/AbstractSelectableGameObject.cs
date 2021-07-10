@@ -283,7 +283,17 @@ namespace Hexagon.GameObjects
             if (StateManager.CurrentState != StateManager.State.DESTROYING_SCENE)
             {
                 OnObjectDestroy?.Invoke(_selectableGameObjectData.ScoreValue);
+                InstantiateVFX();
             }
+        }
+
+        private void InstantiateVFX()
+        {
+            ParticleSystem vfx = Instantiate(_selectableGameObjectData.DestroyParticlePrefab, transform.position, Quaternion.identity);
+            ParticleSystem.MainModule settings = vfx.main;
+            settings.startColor = _selectableGameObjectData.GetColor(Color);
+
+            Destroy(vfx.gameObject, 1f);
         }
     }
 }

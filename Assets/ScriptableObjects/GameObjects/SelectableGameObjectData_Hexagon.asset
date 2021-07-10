@@ -15,3 +15,4 @@ MonoBehaviour:
   _colorAlpha: 0.75
   LerpSpeed: 10
   ScoreValue: 5
+  DestroyParticlePrefab: {fileID: 504043815869504420, guid: cd12435d2ba47734e83db929ca2ed355, type: 3}
