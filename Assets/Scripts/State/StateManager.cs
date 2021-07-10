@@ -15,7 +15,8 @@ namespace Hexagon.State
             DESTROYING,
             FILLING,
             CHECKING,
-            GAME_OVER
+            GAME_OVER,
+            APP_CLOSING
         }
 
         public static State CurrentState = State.CHECKING;

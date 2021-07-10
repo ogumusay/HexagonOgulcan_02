@@ -427,5 +427,10 @@ namespace Hexagon.Board
             return false;
         }
 
+
+        private void OnApplicationQuit()
+        {
+            StateManager.CurrentState = StateManager.State.APP_CLOSING;
+        }
     }
 }
