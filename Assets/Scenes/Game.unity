@@ -529,9 +529,13 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: Hexagon.GameScene.SceneChanger, Assembly-CSharp
       objectReference: {fileID: 0}
+    - target: {fileID: 7002137525576695985, guid: f2ee63afad601ed4e9b9569c257af1bb, type: 3}
+      propertyPath: _boardSettings
+      value: 
+      objectReference: {fileID: 11400000, guid: d6ce88b9803eb4c4ebfd5f4aaeac864f, type: 2}
     - target: {fileID: 8986778932909720575, guid: f2ee63afad601ed4e9b9569c257af1bb, type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f2ee63afad601ed4e9b9569c257af1bb, type: 3}

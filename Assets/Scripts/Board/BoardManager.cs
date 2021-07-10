@@ -4,8 +4,10 @@ using UnityEngine;
 using Hexagon.GameObjects;
 using Hexagon.State;
 using Hexagon.UserInput;
+using Hexagon.Game;
 using System.Linq;
 using System;
+
 
 
 namespace Hexagon.Board
@@ -19,9 +21,14 @@ namespace Hexagon.Board
 
         public static event Action OnNoMoveLeft;
 
+        private int _bombAmount = 0;
+        private int _bombShowUpScore;
+
         private void Awake()
         {
             InputEvents.OnSwipe += StartCoroutineRotate;
+
+            _bombShowUpScore = _boardSettings.BombShowUpScore;
 
             CreateGameObjects(_boardSettings.Row, _boardSettings.Column);
         }
@@ -139,6 +146,8 @@ namespace Hexagon.Board
                 Destroy(gameObject.gameObject, 0.1f);
             }
 
+            AddHexagonBomb();
+
         }
 
         public IEnumerator FillTheEmptySpaces()
@@ -181,11 +190,24 @@ namespace Hexagon.Board
                     {
                         AbstractSelectableGameObject newGameObject;
 
+                        if (_bombAmount <= 0)
+                        {
+                            newGameObject = Instantiate(_boardSettings.HexagonObjectPrefab, new Vector3((i - 1) * 1.75f, newRow + 4, 0f), Quaternion.identity);
+                            newGameObject.PositionOnGrid = new Vector2(i, newRow);
+                            newGameObject.SetRandomColor(_boardSettings.Colors);
+                            newGameObject.transform.parent = _hexagonContainer.transform;
+                        }
+                        else
+                        {
+                            newGameObject = Instantiate(_boardSettings.HexagonBombObjectPrefab, new Vector3((i - 1) * 1.75f, newRow + 4, 0f), Quaternion.identity);
+                            newGameObject.PositionOnGrid = new Vector2(i, newRow);
+                            newGameObject.SetRandomColor(_boardSettings.Colors);
+                            newGameObject.transform.parent = _hexagonBombContainer.transform;
 
-                        newGameObject = Instantiate(_boardSettings.HexagonObjectPrefab, new Vector3((i - 1) * 1.75f, newRow + 4, 0f), Quaternion.identity);
-                        newGameObject.PositionOnGrid = new Vector2(i, newRow);
-                        newGameObject.SetRandomColor(_boardSettings.Colors);
-                        newGameObject.transform.parent = _hexagonContainer.transform;
+                            _bombAmount--;
+                        }
+
+
 
                         _boardSettings.GameObjectList.Add(newGameObject);
 
@@ -252,7 +274,14 @@ namespace Hexagon.Board
                             }
                         }
 
-                        StartCoroutine(FillTheEmptySpaces());
+                        if (StateManager.CurrentState != StateManager.State.GAME_OVER)
+                        {
+                            yield return FillTheEmptySpaces();
+                        }
+                        else
+                        {
+                            yield break;
+                        }
 
                         //Destroyed same color hexagons, dont rotate anymore
                         break;
@@ -266,6 +295,15 @@ namespace Hexagon.Board
         private void StartCoroutineRotate(bool isClockwise)
         {
             StartCoroutine(Rotate(isClockwise));
+        }
+
+        private void AddHexagonBomb()
+        {
+            if (ScoreManager.TotalScore >= _bombShowUpScore)
+            {
+                _bombAmount++;
+                _bombShowUpScore += _boardSettings.BombShowUpEveryScore;
+            }
         }
 
         private void OnDestroy()
@@ -376,7 +414,6 @@ namespace Hexagon.Board
 
             return false;
         }
-
 
         private void OnApplicationQuit()
         {

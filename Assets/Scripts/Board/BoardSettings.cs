@@ -19,6 +19,12 @@ namespace Hexagon.Board
         [SerializeField]
         public float StartDelay;
 
+        [Header("Bomb Settings")]
+        [SerializeField]
+        public int BombShowUpScore;
+        [SerializeField]
+        public int BombShowUpEveryScore;
+
         [Header("Prefabs")]
         [SerializeField]
         public AbstractSelectableGameObject HexagonObjectPrefab;
@@ -326,5 +332,6 @@ namespace Hexagon.Board
                 }
             }
         }
+
     }
 }

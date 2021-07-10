@@ -15,6 +15,8 @@ MonoBehaviour:
   Row: 9
   Column: 8
   StartDelay: 0.8
+  BombShowUpScore: 100
+  BombShowUpEveryScore: 100
   HexagonObjectPrefab: {fileID: 8471155379615840258, guid: a7aceb3ab538e4a4aaddbac5c8b43acc, type: 3}
   HexagonBombObjectPrefab: {fileID: 6237629015460650016, guid: 69e95ffffdd94a94d8c435e7d5133242, type: 3}
   Colors: 0000000001000000020000000300000004000000

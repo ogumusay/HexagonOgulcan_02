@@ -20,8 +20,6 @@ namespace Hexagon.Game
 
         private void EndGame()
         {
-            Debug.Log("game over");
-
             StateManager.CurrentState = StateManager.State.GAME_OVER;
 
             _gameOverUI.SetActive(true);
