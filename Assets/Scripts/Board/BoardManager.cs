@@ -143,10 +143,8 @@ namespace Hexagon.Board
             {
                 _boardSettings.GameObjectList.Remove(gameObject);
 
-                Destroy(gameObject.gameObject, 0.1f);
+                Destroy(gameObject.gameObject);
             }
-
-            AddHexagonBomb();
 
         }
 
@@ -175,6 +173,8 @@ namespace Hexagon.Board
                 }
 
             }
+
+            AddHexagonBomb();
 
             //Create new hexagons above shifted ones
             for (int i = 1; i <= _boardSettings.Column; i++)
