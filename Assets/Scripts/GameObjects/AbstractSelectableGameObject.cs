@@ -17,6 +17,9 @@ namespace Hexagon.GameObjects
         public SelectableGameObjectColor Color;
         public Vector2 PositionOnGrid;
 
+        public delegate void ObjectEvent(int score);
+        public static event ObjectEvent OnObjectDestroy;
+
         private delegate void ClickEvent(Vector2[] positions);
         private event ClickEvent onMouseUp;
 
@@ -40,7 +43,7 @@ namespace Hexagon.GameObjects
         {
             Vector3 targetPosition = GridToWorldPosition();
 
-            transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * _selectableGameObjectData.Speed);
+            transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * _selectableGameObjectData.LerpSpeed);
 
             //If distance is smaller than 0.1f, snap it to targetPosition
             if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
@@ -270,9 +273,17 @@ namespace Hexagon.GameObjects
 
         }
 
-        private void OnDestroy()
+        private void OnDisable()
         {
             onMouseUp -= SelectAdjacentObjects;
+        }
+
+        private void OnDestroy()
+        {
+            if (StateManager.CurrentState != StateManager.State.APP_CLOSING)
+            {
+                OnObjectDestroy?.Invoke(_selectableGameObjectData.ScoreValue);
+            }
         }
     }
 }

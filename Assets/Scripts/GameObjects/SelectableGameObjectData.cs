@@ -17,7 +17,13 @@ namespace Hexagon.GameObjects
         private float _colorAlpha = 0.75f;
 
         [SerializeField]
-        public float Speed = 10f;
+        public float LerpSpeed = 10f;
+
+        public readonly float COLUMN_STEP = 1.75f;
+        public readonly float ROW_STEP = 1;
+
+        [SerializeField]
+        public int ScoreValue;
 
         public Vector3[,] Corners = {/* TOP RIGHT CORNER */
                                     {Vector3.up, (Vector3.right * 1.73f + Vector3.up).normalized},
@@ -32,9 +38,6 @@ namespace Hexagon.GameObjects
                                     /* TOP LEFT CORNER */
                                     {(Vector3.left * 1.73f + Vector3.up).normalized, Vector3.up},
                                     };
-
-        public readonly float COLUMN_STEP = 1.75f;
-        public readonly float ROW_STEP = 1;
 
         public Color GetColor(SelectableGameObjectColor gameObjectColor)
         {
