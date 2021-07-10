@@ -280,7 +280,7 @@ namespace Hexagon.GameObjects
 
         private void OnDestroy()
         {
-            if (StateManager.CurrentState != StateManager.State.APP_CLOSING)
+            if (StateManager.CurrentState != StateManager.State.DESTROYING_SCENE)
             {
                 OnObjectDestroy?.Invoke(_selectableGameObjectData.ScoreValue);
             }

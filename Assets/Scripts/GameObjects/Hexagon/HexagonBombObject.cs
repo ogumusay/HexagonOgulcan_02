@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Hexagon.Board;
+using System;
 
 
 namespace Hexagon.GameObjects
@@ -10,6 +12,8 @@ namespace Hexagon.GameObjects
     {
         [SerializeField] Text countdownText;
         public int countdown = 7;
+
+        public static event Action OnBombExplodes;
 
         protected override void Awake()
         {
@@ -23,8 +27,8 @@ namespace Hexagon.GameObjects
             countdown--;
             countdownText.text = countdown.ToString();
             if (countdown <= 0)
-            {
-                
+            {   
+                OnBombExplodes?.Invoke();
             }
         }
     }

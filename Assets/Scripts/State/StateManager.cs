@@ -12,11 +12,11 @@ namespace Hexagon.State
             EMPTY,
             WAITING,
             ROTATING,
-            DESTROYING,
+            DESTROYING_OBJECTS,
             FILLING,
             CHECKING,
             GAME_OVER,
-            APP_CLOSING
+            DESTROYING_SCENE            
         }
 
         public static State CurrentState = State.CHECKING;

@@ -17,7 +17,7 @@ namespace Hexagon.Board
 
         private GameObject _hexagonContainer, _hexagonBombContainer;
 
-        public static event Action OnGameOver;
+        public static event Action OnNoMoveLeft;
 
         private void Awake()
         {
@@ -75,7 +75,7 @@ namespace Hexagon.Board
 
             yield return new WaitForSeconds(_boardSettings.StartDelay);
 
-            StartCoroutine(FindAllMatches());
+            yield return FindAllMatches();
         }
 
         //Find all 3 same color hexagons on board
@@ -108,19 +108,19 @@ namespace Hexagon.Board
                 }
                 else
                 {
-                    yield return new WaitForSeconds(0.3f);
+                    StateManager.CurrentState = StateManager.State.GAME_OVER;
 
-                    OnGameOver?.Invoke();
+                    yield return new WaitForSeconds(0.3f);
+                    
+                    OnNoMoveLeft?.Invoke();
                 }
             }
 
         }
 
-
-
         public void DestroyGameObjects()
         {
-            StateManager.CurrentState = StateManager.State.DESTROYING;
+            StateManager.CurrentState = StateManager.State.DESTROYING_OBJECTS;
 
             if (_boardSettings.SelectedGameObjects.Count > 0)
             {
@@ -430,7 +430,7 @@ namespace Hexagon.Board
 
         private void OnApplicationQuit()
         {
-            StateManager.CurrentState = StateManager.State.APP_CLOSING;
+            StateManager.CurrentState = StateManager.State.DESTROYING_SCENE;
         }
     }
 }

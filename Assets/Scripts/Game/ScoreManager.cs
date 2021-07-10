@@ -26,5 +26,10 @@ namespace Hexagon.Game
 
             _scoreText.text = _totalScore.ToString();
         }
+
+        private void OnDisable()
+        {
+            AbstractSelectableGameObject.OnObjectDestroy -= EarnScore;
+        }
     }
 }
