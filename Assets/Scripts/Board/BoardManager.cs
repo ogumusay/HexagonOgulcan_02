@@ -156,6 +156,63 @@ namespace Hexagon.Board
                 Find how many empty spaces of underneath of existing ones and --
                 --decrease their y position of gridPositions amount of empty spaces
              */
+            ShifDownObjects();
+
+            AddHexagonBomb();
+
+            //Create new hexagons above shifted ones
+            CreateNewObjects();
+
+            _boardSettings.GameObjectsToDestroy.Clear();
+
+            yield return new WaitForSeconds(1f);
+
+            yield return FindAllMatches();
+        }
+
+        private void CreateNewObjects()
+        {
+            for (int i = 1; i <= _boardSettings.Column; i++)
+            {
+                List<AbstractSelectableGameObject> emptySpacesByColumns = _boardSettings.GameObjectsToDestroy.Where(hex => hex.PositionOnGrid.x == i).ToList();
+
+                if (emptySpacesByColumns.Count > 0)
+                {
+                    int newRow = i % 2 == 0 ? _boardSettings.Row * 2 : (_boardSettings.Row * 2) - 1;
+
+                    //If bombAmount is bigger than 0, instantiate 'bomb hexagon' instead of 'normal hexagon'
+                    for (int j = 0; j < emptySpacesByColumns.Count; j++)
+                    {
+                        AbstractSelectableGameObject newGameObject;
+
+                        if (_bombAmount <= 0)
+                        {
+                            newGameObject = Instantiate(_boardSettings.HexagonObjectPrefab, new Vector3((i - 1) * 1.75f, newRow + 4, 0f), Quaternion.identity, _hexagonContainer.transform);
+                            newGameObject.PositionOnGrid = new Vector2(i, newRow);
+                            newGameObject.SetRandomColor(_boardSettings.Colors);
+                        }
+                        else
+                        {
+                            newGameObject = Instantiate(_boardSettings.HexagonBombObjectPrefab, new Vector3((i - 1) * 1.75f, newRow + 4, 0f), Quaternion.identity, _hexagonBombContainer.transform);
+                            newGameObject.PositionOnGrid = new Vector2(i, newRow);
+                            newGameObject.SetRandomColor(_boardSettings.Colors);
+
+                            _bombAmount--;
+                        }
+
+
+
+                        _boardSettings.GameObjectList.Add(newGameObject);
+
+                        newRow -= 2;
+                    }
+                }
+
+            }
+        }
+
+        private void ShifDownObjects()
+        {
             for (int i = 1; i <= _boardSettings.Column; i++)
             {
                 List<AbstractSelectableGameObject> objectList = _boardSettings.GameObjectList.Where(gameObject => gameObject.PositionOnGrid.x == i).ToList();
@@ -171,57 +228,7 @@ namespace Hexagon.Board
                         gameObject.PositionOnGrid = new Vector2(i, gameObject.PositionOnGrid.y - (emptyGrids.Count * 2));
                     }
                 }
-
             }
-
-            AddHexagonBomb();
-
-            //Create new hexagons above shifted ones
-            for (int i = 1; i <= _boardSettings.Column; i++)
-            {
-                List<AbstractSelectableGameObject> emptySpacesByColumns = _boardSettings.GameObjectsToDestroy.Where(hex => hex.PositionOnGrid.x == i).ToList();
-
-                if (emptySpacesByColumns.Count > 0)
-                {
-                    int newRow = i % 2 == 0 ? _boardSettings.Row * 2 : (_boardSettings.Row * 2) - 1;
-
-                    //If bombAmount is bigger than 0, instantiate 'bomb hexagon' instead of 'normal hexagon'
-                    foreach (var space in emptySpacesByColumns)
-                    {
-                        AbstractSelectableGameObject newGameObject;
-
-                        if (_bombAmount <= 0)
-                        {
-                            newGameObject = Instantiate(_boardSettings.HexagonObjectPrefab, new Vector3((i - 1) * 1.75f, newRow + 4, 0f), Quaternion.identity);
-                            newGameObject.PositionOnGrid = new Vector2(i, newRow);
-                            newGameObject.SetRandomColor(_boardSettings.Colors);
-                            newGameObject.transform.parent = _hexagonContainer.transform;
-                        }
-                        else
-                        {
-                            newGameObject = Instantiate(_boardSettings.HexagonBombObjectPrefab, new Vector3((i - 1) * 1.75f, newRow + 4, 0f), Quaternion.identity);
-                            newGameObject.PositionOnGrid = new Vector2(i, newRow);
-                            newGameObject.SetRandomColor(_boardSettings.Colors);
-                            newGameObject.transform.parent = _hexagonBombContainer.transform;
-
-                            _bombAmount--;
-                        }
-
-
-
-                        _boardSettings.GameObjectList.Add(newGameObject);
-
-                        newRow -= 2;
-                    }
-                }
-
-            }
-
-            _boardSettings.GameObjectsToDestroy.Clear();
-
-            yield return new WaitForSeconds(1f);
-
-            yield return FindAllMatches();
         }
 
         private IEnumerator Rotate(bool isClockwise)
@@ -360,11 +367,9 @@ namespace Hexagon.Board
 
                                         }
                                     }
-
                                 }
                             }
                         }
-
                     }
                 }
                 else
