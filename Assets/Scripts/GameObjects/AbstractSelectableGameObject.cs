@@ -19,15 +19,7 @@ namespace Hexagon.GameObjects
 
         public delegate void ObjectEvent(int score);
         public static event ObjectEvent OnObjectDestroy;
-
-        private delegate void ClickEvent(Vector2[] positions);
-        private event ClickEvent onMouseUp;
-
-        protected virtual void Awake()
-        {
-            onMouseUp += SelectAdjacentObjects;
-        }
-
+        
         private void Update()
         {
             // Checking 'world position' if it's on right position according to 'grid position'
@@ -79,138 +71,9 @@ namespace Hexagon.GameObjects
             _spriteRenderer.color = _selectableGameObjectData.GetColor(Color);
         }
 
-        public Vector2[] FindGridPositionsOfAdjacentObjects()
-        {
-            //Finding angle between 'center of hexagon' and 'mouse position'
-            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3 mousePos = new Vector3(mouseWorldPos.x, mouseWorldPos.y, 0f);
-            Vector3 vectorBetweenMouseAndHex = mousePos - transform.position;
-
-            float angle = Vector3.SignedAngle(transform.up, vectorBetweenMouseAndHex, Vector3.forward);
-
-            //
-            //RIGHT CORNER
-            //
-            if (angle > -120f && angle < -60f &&
-                    PositionOnGrid.y > 1 && PositionOnGrid.x < _boardSettings.Column && PositionOnGrid.y < _boardSettings.Row * 2)
-            {
-                Vector2[] adjacentHexagons = {new Vector2(PositionOnGrid.x + 1, PositionOnGrid.y + 1),
-                                            new Vector2(PositionOnGrid.x + 1, PositionOnGrid.y - 1),
-                                                PositionOnGrid};
-
-                return adjacentHexagons;
-            }
-            //
-            //BOTTOM RIGHT CORNER
-            //
-            else if (angle > -180f && angle < -120f &&
-                        PositionOnGrid.y > 2 && PositionOnGrid.x < _boardSettings.Column)
-            {
-                Vector2[] adjacentHexagons = {new Vector2(PositionOnGrid.x + 1, PositionOnGrid.y - 1),
-                                            new Vector2(PositionOnGrid.x, PositionOnGrid.y - 2),
-                                                PositionOnGrid};
-
-                return adjacentHexagons;
-            }
-            //
-            //BOTTOM LEFT CORNER
-            //
-            else if (angle < 180f && angle > 120f &&
-                        PositionOnGrid.x > 1 && PositionOnGrid.y > 2)
-            {
-                Vector2[] adjacentHexagons = {new Vector2(PositionOnGrid.x, PositionOnGrid.y - 2),
-                                            new Vector2(PositionOnGrid.x - 1, PositionOnGrid.y - 1),
-                                                PositionOnGrid};
-
-                return adjacentHexagons;
-            }
-            //
-            //LEFT CORNER
-            //     
-            else if (angle < 120f && angle > 60f &&
-                        PositionOnGrid.x > 1 && PositionOnGrid.y > 1 && PositionOnGrid.y < _boardSettings.Row * 2)
-            {
-                Vector2[] adjacentHexagons = {new Vector2(PositionOnGrid.x - 1, PositionOnGrid.y - 1),
-                                            new Vector2(PositionOnGrid.x - 1, PositionOnGrid.y + 1),
-                                                PositionOnGrid};
-
-                return adjacentHexagons;
-            }
-            //
-            //TOP LEFT CORNER
-            //         
-            else if (angle < 60f && angle > 0f &&
-                        PositionOnGrid.x > 1 && PositionOnGrid.y + 1 < _boardSettings.Row * 2)
-            {
-                Vector2[] adjacentHexagons = {new Vector2(PositionOnGrid.x - 1, PositionOnGrid.y + 1),
-                                            new Vector2(PositionOnGrid.x, PositionOnGrid.y + 2),
-                                                PositionOnGrid};
-
-                return adjacentHexagons;
-            }
-            //
-            //TOP RIGHT CORNER
-            // 
-            else if (angle < 0f && angle > -60f &&
-                        PositionOnGrid.x < _boardSettings.Column && PositionOnGrid.y + 1 < _boardSettings.Row * 2)
-            {
-                Vector2[] adjacentHexagons = {new Vector2(PositionOnGrid.x, PositionOnGrid.y + 2),
-                                            new Vector2(PositionOnGrid.x + 1, PositionOnGrid.y + 1),
-                                                PositionOnGrid};
-
-                return adjacentHexagons;
-            }
-
-            return null;
-        }
-
-        public virtual void SelectAdjacentObjects(Vector2[] positions)
-        {
-            if (positions != null)
-            {
-                //If there is already selected hexagons, remove them from list
-                if (_boardSettings.SelectedGameObjects.Count > 0)
-                {
-                    foreach (var gameObject in _boardSettings.SelectedGameObjects)
-                    {
-                        //Reset color of hexagon
-                        if (gameObject != null)
-                        {
-                            gameObject.SetColor();
-                        }
-                    }
-
-                    _boardSettings.SelectedGameObjects.Clear();
-                }
-
-                //Add hexagons that found by gridPosition to 'selectedHexagons' list
-                foreach (var position in positions)
-                {
-                    AbstractSelectableGameObject hexagon = _boardSettings.GameObjectList.Where(hex => hex.PositionOnGrid == position).FirstOrDefault();
-
-                    _boardSettings.SelectedGameObjects.Add(hexagon);
-                }
-
-                //Make selected hexagons more visible
-                foreach (var hex in _boardSettings.SelectedGameObjects)
-                {
-                    hex.MakeHighlighted();
-                }
-            }
-
-        }
-
         public void MakeHighlighted()
         {
             _spriteRenderer.color += new Color(0.2f, 0.2f, 0.2f, 1f);
-        }
-
-        private void OnMouseUp()
-        {
-            if (StateManager.CurrentState == StateManager.State.EMPTY)
-            {
-                onMouseUp?.Invoke(FindGridPositionsOfAdjacentObjects());
-            }
         }
 
         public Vector3 GridToWorldPosition()
@@ -271,11 +134,6 @@ namespace Hexagon.GameObjects
                 }
             }
 
-        }
-
-        private void OnDisable()
-        {
-            onMouseUp -= SelectAdjacentObjects;
         }
 
         private void OnDestroy()

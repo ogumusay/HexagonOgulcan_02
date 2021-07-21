@@ -7,6 +7,6 @@ namespace Hexagon.GameObjects
 {
     public interface ISelectable
     {
-        void SelectAdjacentObjects(Vector2[] positions);
+        
     }
 }

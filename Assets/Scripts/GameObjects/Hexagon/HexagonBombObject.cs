@@ -15,10 +15,9 @@ namespace Hexagon.GameObjects
 
         public static event Action OnBombExplodes;
 
-        protected override void Awake()
+        private void Awake()
         {
             countdownText.text = countdown.ToString();
-            base.Awake();
         }
 
         //If countdown hits 0, end game
