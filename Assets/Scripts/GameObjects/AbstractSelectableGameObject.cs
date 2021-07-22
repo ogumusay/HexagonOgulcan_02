@@ -17,7 +17,7 @@ namespace Hexagon.GameObjects
         public SelectableGameObjectColor Color;
         public Vector2 PositionOnGrid;
 
-        public delegate void ObjectEvent(int score);
+        public delegate void ObjectEvent(AbstractSelectableGameObject gameObject, SelectableGameObjectData data);
         public static event ObjectEvent OnObjectDestroy;
         
         private void Update()
@@ -140,18 +140,8 @@ namespace Hexagon.GameObjects
         {
             if (StateManager.CurrentState != StateManager.State.DESTROYING_SCENE)
             {
-                OnObjectDestroy?.Invoke(_selectableGameObjectData.ScoreValue);
-                InstantiateVFX();
+                OnObjectDestroy?.Invoke(this, _selectableGameObjectData);
             }
-        }
-
-        private void InstantiateVFX()
-        {
-            ParticleSystem vfx = Instantiate(_selectableGameObjectData.DestroyParticlePrefab, transform.position, Quaternion.identity);
-            ParticleSystem.MainModule settings = vfx.main;
-            settings.startColor = _selectableGameObjectData.GetColor(Color);
-
-            Destroy(vfx.gameObject, 1f);
         }
     }
 }

@@ -22,9 +22,9 @@ namespace Hexagon.Game
         }
 
         //Earn score for each destroyed blocks and show it on UI text
-        public void EarnScore(int score)
+        public void EarnScore(AbstractSelectableGameObject gameObject, SelectableGameObjectData data)
         {
-            TotalScore += score;
+            TotalScore += data.ScoreValue;
 
             _scoreText.text = TotalScore.ToString();
         }

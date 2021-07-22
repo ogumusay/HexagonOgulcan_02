@@ -332,6 +332,5 @@ namespace Hexagon.Board
                 }
             }
         }
-
     }
 }

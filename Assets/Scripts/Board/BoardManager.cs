@@ -30,11 +30,11 @@ namespace Hexagon.Board
 
             _bombShowUpScore = _boardSettings.BombShowUpScore;
 
-            CreateGameObjects(_boardSettings.Row, _boardSettings.Column);
+            CreateBoard(_boardSettings.Row, _boardSettings.Column);
         }
 
         //Create hexagons in loops by columns and rows
-        private void CreateGameObjects(int row, int column)
+        private void CreateBoard(int row, int column)
         {
             //Create containers
             _hexagonContainer = new GameObject("Hexagons");
