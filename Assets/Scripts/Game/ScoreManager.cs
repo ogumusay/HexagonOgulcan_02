@@ -10,7 +10,7 @@ namespace Hexagon.Game
 {
     public class ScoreManager : MonoBehaviour
     {
-        [SerializeField] private BoardSettings _boardSettings;
+        [SerializeField] private BoardData _boardData;
         [SerializeField] private Text _scoreText;
         [SerializeField] private GameObject _gameOverUI;
 

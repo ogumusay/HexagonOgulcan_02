@@ -10,7 +10,7 @@ namespace Hexagon.Game
     [CreateAssetMenu(menuName = "Hexagon/Game/SelectionControllerSettings")]
     public class SelectionControllerSettings : ScriptableObject
     {
-        [SerializeField] private BoardSettings _boardSettings;
+        [SerializeField] private BoardData _boardData;
 
         private Vector2[] FindGridPositionsOfAdjacentObjects(AbstractSelectableGameObject selectableGameObject)
         {
@@ -26,8 +26,8 @@ namespace Hexagon.Game
             //
             if (angle > -120f && angle < -60f &&
                     selectableGameObject.PositionOnGrid.y > 1 &&
-                    selectableGameObject.PositionOnGrid.x < _boardSettings.Column &&
-                    selectableGameObject.PositionOnGrid.y < _boardSettings.Row * 2)
+                    selectableGameObject.PositionOnGrid.x < _boardData.Column &&
+                    selectableGameObject.PositionOnGrid.y < _boardData.Row * 2)
             {
                 Vector2[] adjacentHexagons = {new Vector2(selectableGameObject.PositionOnGrid.x + 1, selectableGameObject.PositionOnGrid.y + 1),
                                             new Vector2(selectableGameObject.PositionOnGrid.x + 1, selectableGameObject.PositionOnGrid.y - 1),
@@ -40,7 +40,7 @@ namespace Hexagon.Game
             //
             else if (angle > -180f && angle < -120f &&
                         selectableGameObject.PositionOnGrid.y > 2 &&
-                        selectableGameObject.PositionOnGrid.x < _boardSettings.Column)
+                        selectableGameObject.PositionOnGrid.x < _boardData.Column)
             {
                 Vector2[] adjacentHexagons = {new Vector2(selectableGameObject.PositionOnGrid.x + 1, selectableGameObject.PositionOnGrid.y - 1),
                                             new Vector2(selectableGameObject.PositionOnGrid.x, selectableGameObject.PositionOnGrid.y - 2),
@@ -66,7 +66,7 @@ namespace Hexagon.Game
             else if (angle < 120f && angle > 60f &&
                         selectableGameObject.PositionOnGrid.x > 1 &&
                         selectableGameObject.PositionOnGrid.y > 1 &&
-                        selectableGameObject.PositionOnGrid.y < _boardSettings.Row * 2)
+                        selectableGameObject.PositionOnGrid.y < _boardData.Row * 2)
             {
                 Vector2[] adjacentHexagons = {new Vector2(selectableGameObject.PositionOnGrid.x - 1, selectableGameObject.PositionOnGrid.y - 1),
                                             new Vector2(selectableGameObject.PositionOnGrid.x - 1, selectableGameObject.PositionOnGrid.y + 1),
@@ -79,7 +79,7 @@ namespace Hexagon.Game
             //         
             else if (angle < 60f && angle > 0f &&
                         selectableGameObject.PositionOnGrid.x > 1 &&
-                        selectableGameObject.PositionOnGrid.y + 1 < _boardSettings.Row * 2)
+                        selectableGameObject.PositionOnGrid.y + 1 < _boardData.Row * 2)
             {
                 Vector2[] adjacentHexagons = {new Vector2(selectableGameObject.PositionOnGrid.x - 1, selectableGameObject.PositionOnGrid.y + 1),
                                             new Vector2(selectableGameObject.PositionOnGrid.x, selectableGameObject.PositionOnGrid.y + 2),
@@ -91,8 +91,8 @@ namespace Hexagon.Game
             //TOP RIGHT CORNER
             // 
             else if (angle < 0f && angle > -60f &&
-                        selectableGameObject.PositionOnGrid.x < _boardSettings.Column &&
-                        selectableGameObject.PositionOnGrid.y + 1 < _boardSettings.Row * 2)
+                        selectableGameObject.PositionOnGrid.x < _boardData.Column &&
+                        selectableGameObject.PositionOnGrid.y + 1 < _boardData.Row * 2)
             {
                 Vector2[] adjacentHexagons = {new Vector2(selectableGameObject.PositionOnGrid.x, selectableGameObject.PositionOnGrid.y + 2),
                                             new Vector2(selectableGameObject.PositionOnGrid.x + 1, selectableGameObject.PositionOnGrid.y + 1),
@@ -109,9 +109,9 @@ namespace Hexagon.Game
             if (positions != null)
             {
                 //If there is already selected hexagons, remove them from list
-                if (_boardSettings.SelectedGameObjects.Count > 0)
+                if (_boardData.SelectedGameObjects.Count > 0)
                 {
-                    foreach (var gameObject in _boardSettings.SelectedGameObjects)
+                    foreach (var gameObject in _boardData.SelectedGameObjects)
                     {
                         //Reset color of hexagon
                         if (gameObject != null)
@@ -120,19 +120,19 @@ namespace Hexagon.Game
                         }
                     }
 
-                    _boardSettings.SelectedGameObjects.Clear();
+                    _boardData.SelectedGameObjects.Clear();
                 }
 
                 //Add hexagons that found by gridPosition to 'selectedHexagons' list
                 foreach (var position in positions)
                 {
-                    AbstractSelectableGameObject hexagon = _boardSettings.GameObjectList.Where(hex => hex.PositionOnGrid == position).FirstOrDefault();
+                    AbstractSelectableGameObject hexagon = _boardData.GameObjectList.Where(hex => hex.PositionOnGrid == position).FirstOrDefault();
 
-                    _boardSettings.SelectedGameObjects.Add(hexagon);
+                    _boardData.SelectedGameObjects.Add(hexagon);
                 }
 
                 //Make selected hexagons more visible
-                foreach (var hex in _boardSettings.SelectedGameObjects)
+                foreach (var hex in _boardData.SelectedGameObjects)
                 {
                     hex.MakeHighlighted();
                 }

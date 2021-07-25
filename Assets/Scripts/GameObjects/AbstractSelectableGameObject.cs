@@ -10,7 +10,7 @@ namespace Hexagon.GameObjects
 {
     public abstract class AbstractSelectableGameObject : MonoBehaviour, ISelectable
     {
-        [SerializeField] protected BoardSettings _boardSettings;
+        [SerializeField] protected BoardData _boardData;
         [SerializeField] protected SelectableGameObjectData _selectableGameObjectData;
         [SerializeField] private SpriteRenderer _spriteRenderer;
 
@@ -127,9 +127,9 @@ namespace Hexagon.GameObjects
             {
                 foreach (var gameObject in sameColorGameObjects)
                 {
-                    if (!_boardSettings.GameObjectsToDestroy.Contains(gameObject))
+                    if (!_boardData.GameObjectsToDestroy.Contains(gameObject))
                     {
-                        _boardSettings.GameObjectsToDestroy.Add(gameObject);
+                        _boardData.GameObjectsToDestroy.Add(gameObject);
                     }
                 }
             }

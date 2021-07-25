@@ -15,7 +15,7 @@ namespace Hexagon.Board
     public class BoardManager : MonoBehaviour
     {
         [SerializeField]
-        private BoardSettings _boardSettings;
+        private BoardData _boardData;
 
         private GameObject _hexagonContainer, _hexagonBombContainer;
 
@@ -28,9 +28,9 @@ namespace Hexagon.Board
         {
             InputEvents.OnSwipe += StartCoroutineRotate;
 
-            _bombShowUpScore = _boardSettings.BombShowUpScore;
+            _bombShowUpScore = _boardData.BombShowUpScore;
 
-            CreateBoard(_boardSettings.Row, _boardSettings.Column);
+            CreateBoard(_boardData.Row, _boardData.Column);
         }
 
         //Create hexagons in loops by columns and rows
@@ -46,30 +46,30 @@ namespace Hexagon.Board
                 {
                     for (int j = 0; j < row; j++)
                     {
-                        AbstractSelectableGameObject hexagon = Instantiate(_boardSettings.HexagonObjectPrefab, Vector3.zero, Quaternion.identity);
+                        AbstractSelectableGameObject hexagon = Instantiate(_boardData.HexagonObjectPrefab, Vector3.zero, Quaternion.identity);
 
                         hexagon.PositionOnGrid = new Vector2(i + 1, j * 2 + 1);
-                        hexagon.SetRandomColor(_boardSettings.Colors);
+                        hexagon.SetRandomColor(_boardData.Colors);
 
                         hexagon.transform.position = hexagon.GridToWorldPosition();
                         hexagon.transform.parent = _hexagonContainer.transform;
 
-                        _boardSettings.GameObjectList.Add(hexagon);
+                        _boardData.GameObjectList.Add(hexagon);
                     }
                 }
                 else
                 {
                     for (int j = 0; j < row; j++)
                     {
-                        AbstractSelectableGameObject hexagon = Instantiate(_boardSettings.HexagonObjectPrefab, Vector3.zero, Quaternion.identity);
+                        AbstractSelectableGameObject hexagon = Instantiate(_boardData.HexagonObjectPrefab, Vector3.zero, Quaternion.identity);
 
                         hexagon.PositionOnGrid = new Vector2(i + 1, j * 2 + 2);
-                        hexagon.SetRandomColor(_boardSettings.Colors);
+                        hexagon.SetRandomColor(_boardData.Colors);
 
                         hexagon.transform.position = hexagon.GridToWorldPosition();
                         hexagon.transform.parent = _hexagonContainer.transform;
 
-                        _boardSettings.GameObjectList.Add(hexagon);
+                        _boardData.GameObjectList.Add(hexagon);
                     }
                 }
             }
@@ -79,7 +79,7 @@ namespace Hexagon.Board
         {
             StateManager.CurrentState = StateManager.State.WAITING;
 
-            yield return new WaitForSeconds(_boardSettings.StartDelay);
+            yield return new WaitForSeconds(_boardData.StartDelay);
 
             yield return FindAllMatches();
         }
@@ -90,13 +90,13 @@ namespace Hexagon.Board
             StateManager.CurrentState = StateManager.State.CHECKING;
 
             //Every hex in board send rays to check same color hexagons nearby
-            foreach (var gameObject in _boardSettings.GameObjectList)
+            foreach (var gameObject in _boardData.GameObjectList)
             {
                 gameObject.SendRays();
             }
 
             //If 3 or more hexagons to destroy, destroy them
-            if (_boardSettings.GameObjectsToDestroy.Count > 2)
+            if (_boardData.GameObjectsToDestroy.Count > 2)
             {
                 DestroyGameObjects();
 
@@ -128,20 +128,20 @@ namespace Hexagon.Board
         {
             StateManager.CurrentState = StateManager.State.DESTROYING_OBJECTS;
 
-            if (_boardSettings.SelectedGameObjects.Count > 0)
+            if (_boardData.SelectedGameObjects.Count > 0)
             {
-                foreach (var hexagon in _boardSettings.SelectedGameObjects)
+                foreach (var hexagon in _boardData.SelectedGameObjects)
                 {
                     hexagon.SetColor();
                 }
 
-                _boardSettings.SelectedGameObjects.Clear();
+                _boardData.SelectedGameObjects.Clear();
             }
 
             //Remove destroyed ones and show VFX
-            foreach (var gameObject in _boardSettings.GameObjectsToDestroy)
+            foreach (var gameObject in _boardData.GameObjectsToDestroy)
             {
-                _boardSettings.GameObjectList.Remove(gameObject);
+                _boardData.GameObjectList.Remove(gameObject);
 
                 Destroy(gameObject.gameObject);
             }
@@ -163,7 +163,7 @@ namespace Hexagon.Board
             //Create new hexagons above shifted ones
             CreateNewObjects();
 
-            _boardSettings.GameObjectsToDestroy.Clear();
+            _boardData.GameObjectsToDestroy.Clear();
 
             yield return new WaitForSeconds(1f);
 
@@ -172,13 +172,13 @@ namespace Hexagon.Board
 
         private void CreateNewObjects()
         {
-            for (int i = 1; i <= _boardSettings.Column; i++)
+            for (int i = 1; i <= _boardData.Column; i++)
             {
-                List<AbstractSelectableGameObject> emptySpacesByColumns = _boardSettings.GameObjectsToDestroy.Where(hex => hex.PositionOnGrid.x == i).ToList();
+                List<AbstractSelectableGameObject> emptySpacesByColumns = _boardData.GameObjectsToDestroy.Where(hex => hex.PositionOnGrid.x == i).ToList();
 
                 if (emptySpacesByColumns.Count > 0)
                 {
-                    int newRow = i % 2 == 0 ? _boardSettings.Row * 2 : (_boardSettings.Row * 2) - 1;
+                    int newRow = i % 2 == 0 ? _boardData.Row * 2 : (_boardData.Row * 2) - 1;
 
                     //If bombAmount is bigger than 0, instantiate 'bomb hexagon' instead of 'normal hexagon'
                     for (int j = 0; j < emptySpacesByColumns.Count; j++)
@@ -187,22 +187,22 @@ namespace Hexagon.Board
 
                         if (_bombAmount <= 0)
                         {
-                            newGameObject = Instantiate(_boardSettings.HexagonObjectPrefab, new Vector3((i - 1) * 1.75f, newRow + 4, 0f), Quaternion.identity, _hexagonContainer.transform);
+                            newGameObject = Instantiate(_boardData.HexagonObjectPrefab, new Vector3((i - 1) * 1.75f, newRow + 4, 0f), Quaternion.identity, _hexagonContainer.transform);
                             newGameObject.PositionOnGrid = new Vector2(i, newRow);
-                            newGameObject.SetRandomColor(_boardSettings.Colors);
+                            newGameObject.SetRandomColor(_boardData.Colors);
                         }
                         else
                         {
-                            newGameObject = Instantiate(_boardSettings.HexagonBombObjectPrefab, new Vector3((i - 1) * 1.75f, newRow + 4, 0f), Quaternion.identity, _hexagonBombContainer.transform);
+                            newGameObject = Instantiate(_boardData.HexagonBombObjectPrefab, new Vector3((i - 1) * 1.75f, newRow + 4, 0f), Quaternion.identity, _hexagonBombContainer.transform);
                             newGameObject.PositionOnGrid = new Vector2(i, newRow);
-                            newGameObject.SetRandomColor(_boardSettings.Colors);
+                            newGameObject.SetRandomColor(_boardData.Colors);
 
                             _bombAmount--;
                         }
 
 
 
-                        _boardSettings.GameObjectList.Add(newGameObject);
+                        _boardData.GameObjectList.Add(newGameObject);
 
                         newRow -= 2;
                     }
@@ -213,14 +213,14 @@ namespace Hexagon.Board
 
         private void ShifDownObjects()
         {
-            for (int i = 1; i <= _boardSettings.Column; i++)
+            for (int i = 1; i <= _boardData.Column; i++)
             {
-                List<AbstractSelectableGameObject> objectList = _boardSettings.GameObjectList.Where(gameObject => gameObject.PositionOnGrid.x == i).ToList();
+                List<AbstractSelectableGameObject> objectList = _boardData.GameObjectList.Where(gameObject => gameObject.PositionOnGrid.x == i).ToList();
 
                 foreach (var gameObject in objectList)
                 {
                     List<Vector2> emptyGrids =
-                        _boardSettings.GameObjectsToDestroy.Where(grid => grid.PositionOnGrid.x == i & grid.PositionOnGrid.y < gameObject.PositionOnGrid.y)
+                        _boardData.GameObjectsToDestroy.Where(grid => grid.PositionOnGrid.x == i & grid.PositionOnGrid.y < gameObject.PositionOnGrid.y)
                                             .Select(grid => grid.PositionOnGrid).ToList();
 
                     if (emptyGrids.Count > 0)
@@ -233,38 +233,38 @@ namespace Hexagon.Board
 
         private IEnumerator Rotate(bool isClockwise)
         {
-            if (_boardSettings.SelectedGameObjects.Count > 0 && StateManager.CurrentState == StateManager.State.EMPTY)
+            if (_boardData.SelectedGameObjects.Count > 0 && StateManager.CurrentState == StateManager.State.EMPTY)
             {
                 StateManager.CurrentState = StateManager.State.ROTATING;
 
                 for (int i = 0; i < 3; i++)
                 {
-                    Vector2 tempGridPos = _boardSettings.SelectedGameObjects[0].PositionOnGrid;
+                    Vector2 tempGridPos = _boardData.SelectedGameObjects[0].PositionOnGrid;
 
                     if (isClockwise)
                     {
-                        _boardSettings.SelectedGameObjects[0].PositionOnGrid = _boardSettings.SelectedGameObjects[1].PositionOnGrid;
-                        _boardSettings.SelectedGameObjects[1].PositionOnGrid = _boardSettings.SelectedGameObjects[2].PositionOnGrid;
-                        _boardSettings.SelectedGameObjects[2].PositionOnGrid = tempGridPos;
+                        _boardData.SelectedGameObjects[0].PositionOnGrid = _boardData.SelectedGameObjects[1].PositionOnGrid;
+                        _boardData.SelectedGameObjects[1].PositionOnGrid = _boardData.SelectedGameObjects[2].PositionOnGrid;
+                        _boardData.SelectedGameObjects[2].PositionOnGrid = tempGridPos;
                     }
                     else
                     {
-                        _boardSettings.SelectedGameObjects[0].PositionOnGrid = _boardSettings.SelectedGameObjects[2].PositionOnGrid;
-                        _boardSettings.SelectedGameObjects[2].PositionOnGrid = _boardSettings.SelectedGameObjects[1].PositionOnGrid;
-                        _boardSettings.SelectedGameObjects[1].PositionOnGrid = tempGridPos;
+                        _boardData.SelectedGameObjects[0].PositionOnGrid = _boardData.SelectedGameObjects[2].PositionOnGrid;
+                        _boardData.SelectedGameObjects[2].PositionOnGrid = _boardData.SelectedGameObjects[1].PositionOnGrid;
+                        _boardData.SelectedGameObjects[1].PositionOnGrid = tempGridPos;
                     }
 
                     yield return new WaitForSeconds(0.3f);
 
                     //Check every rotation if there is 3 or more same color hexagon
-                    foreach (var hex in _boardSettings.SelectedGameObjects)
+                    foreach (var hex in _boardData.SelectedGameObjects)
                     {
                         hex.SendRays();
                     }
 
 
                     //if there is 3 or more same color hexagon
-                    if (_boardSettings.GameObjectsToDestroy.Count > 0)
+                    if (_boardData.GameObjectsToDestroy.Count > 0)
                     {
                         yield return new WaitForSeconds(0.7f);
 
@@ -309,7 +309,7 @@ namespace Hexagon.Board
             if (ScoreManager.TotalScore >= _bombShowUpScore)
             {
                 _bombAmount++;
-                _bombShowUpScore += _boardSettings.BombShowUpEveryScore;
+                _bombShowUpScore += _boardData.BombShowUpEveryScore;
             }
         }
 
@@ -317,7 +317,7 @@ namespace Hexagon.Board
         {
             InputEvents.OnSwipe -= StartCoroutineRotate;
 
-            _boardSettings.ClearLists();
+            _boardData.ClearLists();
         }
 
         /*  ->Go to every hexagon on board
@@ -330,32 +330,32 @@ namespace Hexagon.Board
             */
         private bool PossibleMoveLeft()
         {
-            for (int i = 1; i <= _boardSettings.Column; i++)
+            for (int i = 1; i <= _boardData.Column; i++)
             {
                 if (i % 2 == 0)
                 {
-                    for (int j = 2; j <= _boardSettings.Row * 2; j = j + 2)
+                    for (int j = 2; j <= _boardData.Row * 2; j = j + 2)
                     {
-                        AbstractSelectableGameObject centerHexagon = _boardSettings.GameObjectList.Where(hex => hex.PositionOnGrid == new Vector2(i, j)).FirstOrDefault();
+                        AbstractSelectableGameObject centerHexagon = _boardData.GameObjectList.Where(hex => hex.PositionOnGrid == new Vector2(i, j)).FirstOrDefault();
 
-                        foreach (var grid in _boardSettings.FindAdjacentHexagons(new Vector2(i, j)))
+                        foreach (var grid in _boardData.FindAdjacentHexagons(new Vector2(i, j)))
                         {
-                            AbstractSelectableGameObject otherHexagon = _boardSettings.GameObjectList.Where(hex => hex.PositionOnGrid == grid).FirstOrDefault();
+                            AbstractSelectableGameObject otherHexagon = _boardData.GameObjectList.Where(hex => hex.PositionOnGrid == grid).FirstOrDefault();
 
                             if (otherHexagon.Color == centerHexagon.Color)
                             {
                                 foreach (var sharedHex in
-                                        _boardSettings.FindSharedHexagons(centerHexagon.PositionOnGrid, otherHexagon.PositionOnGrid))
+                                        _boardData.FindSharedHexagons(centerHexagon.PositionOnGrid, otherHexagon.PositionOnGrid))
                                 {
 
-                                    foreach (var hexGrid in _boardSettings.FindAdjacentHexagons(sharedHex))
+                                    foreach (var hexGrid in _boardData.FindAdjacentHexagons(sharedHex))
                                     {
                                         if (hexGrid == centerHexagon.PositionOnGrid || hexGrid == otherHexagon.PositionOnGrid)
                                         {
                                             continue;
                                         }
 
-                                        AbstractSelectableGameObject hex = _boardSettings.GameObjectList.Where(hex => hex.PositionOnGrid == hexGrid).
+                                        AbstractSelectableGameObject hex = _boardData.GameObjectList.Where(hex => hex.PositionOnGrid == hexGrid).
                                                         FirstOrDefault();
 
                                         if (hex != null)
@@ -374,30 +374,30 @@ namespace Hexagon.Board
                 }
                 else
                 {
-                    for (int j = 1; j <= (_boardSettings.Row * 2) - 1; j = j + 2)
+                    for (int j = 1; j <= (_boardData.Row * 2) - 1; j = j + 2)
                     {
 
-                        AbstractSelectableGameObject centerHexagon = _boardSettings.GameObjectList.Where(hex => hex.PositionOnGrid == new Vector2(i, j)).FirstOrDefault();
+                        AbstractSelectableGameObject centerHexagon = _boardData.GameObjectList.Where(hex => hex.PositionOnGrid == new Vector2(i, j)).FirstOrDefault();
                         List<AbstractSelectableGameObject> adjacentHexagons = new List<AbstractSelectableGameObject>();
 
-                        foreach (var grid in _boardSettings.FindAdjacentHexagons(new Vector2(i, j)))
+                        foreach (var grid in _boardData.FindAdjacentHexagons(new Vector2(i, j)))
                         {
-                            AbstractSelectableGameObject otherHexagon = _boardSettings.GameObjectList.Where(hex => hex.PositionOnGrid == grid).FirstOrDefault();
+                            AbstractSelectableGameObject otherHexagon = _boardData.GameObjectList.Where(hex => hex.PositionOnGrid == grid).FirstOrDefault();
 
                             if (otherHexagon.Color == centerHexagon.Color)
                             {
                                 foreach (var sharedHex in
-                                        _boardSettings.FindSharedHexagons(centerHexagon.PositionOnGrid, otherHexagon.PositionOnGrid))
+                                        _boardData.FindSharedHexagons(centerHexagon.PositionOnGrid, otherHexagon.PositionOnGrid))
                                 {
 
-                                    foreach (var hexGrid in _boardSettings.FindAdjacentHexagons(sharedHex))
+                                    foreach (var hexGrid in _boardData.FindAdjacentHexagons(sharedHex))
                                     {
                                         if (hexGrid == centerHexagon.PositionOnGrid || hexGrid == otherHexagon.PositionOnGrid)
                                         {
                                             continue;
                                         }
 
-                                        AbstractSelectableGameObject hex = _boardSettings.GameObjectList.Where(hex => hex.PositionOnGrid == hexGrid).
+                                        AbstractSelectableGameObject hex = _boardData.GameObjectList.Where(hex => hex.PositionOnGrid == hexGrid).
                                                         FirstOrDefault();
 
                                         if (hex != null)

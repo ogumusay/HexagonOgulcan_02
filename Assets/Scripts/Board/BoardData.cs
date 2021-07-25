@@ -6,8 +6,8 @@ using System.Linq;
 
 namespace Hexagon.Board
 {
-    [CreateAssetMenu(menuName = "Hexagon/Board/BoardSettings")]
-    public class BoardSettings : ScriptableObject
+    [CreateAssetMenu(menuName = "Hexagon/Board/Board Data")]
+    public class BoardData : ScriptableObject
     {
         [Header("Size")]
         [SerializeField]
