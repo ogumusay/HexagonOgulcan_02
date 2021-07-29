@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d6c778988526348befdd58a88a99a4, type: 3}
   m_Name: Selection Controller Settings
   m_EditorClassIdentifier: 
-  _boardSettings: {fileID: 11400000, guid: d6ce88b9803eb4c4ebfd5f4aaeac864f, type: 2}
+  _boardData: {fileID: 11400000, guid: 4685c063d4955c640854adb7325f7a0f, type: 2}

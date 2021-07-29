@@ -128,7 +128,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36796e5215ed9ea42b91a1cdf23b086f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _boardSettings: {fileID: 11400000, guid: d6ce88b9803eb4c4ebfd5f4aaeac864f, type: 2}
+  _boardData: {fileID: 11400000, guid: 4685c063d4955c640854adb7325f7a0f, type: 2}
   _selectableGameObjectData: {fileID: 11400000, guid: e158c874bdad00842bb364536b949f3c, type: 2}
   _spriteRenderer: {fileID: 2566588102024007149}
   Color: 0

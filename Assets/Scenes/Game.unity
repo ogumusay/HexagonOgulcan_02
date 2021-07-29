@@ -206,7 +206,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d625e93a7bbe924aacc94b84b19cd4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _boardSettings: {fileID: 11400000, guid: d6ce88b9803eb4c4ebfd5f4aaeac864f, type: 2}
+  _boardData: {fileID: 11400000, guid: 4685c063d4955c640854adb7325f7a0f, type: 2}
   _camera: {fileID: 519420031}
 --- !u!20 &519420031
 Camera:
@@ -491,7 +491,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ceae3c96e3444574994d26cc265090b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _boardSettings: {fileID: 11400000, guid: d6ce88b9803eb4c4ebfd5f4aaeac864f, type: 2}
+  _boardData: {fileID: 11400000, guid: 4685c063d4955c640854adb7325f7a0f, type: 2}
 --- !u!4 &2020616535
 Transform:
   m_ObjectHideFlags: 0
@@ -634,30 +634,6 @@ PrefabInstance:
     - target: {fileID: 5815043057988913336, guid: f2ee63afad601ed4e9b9569c257af1bb, type: 3}
       propertyPath: m_Name
       value: UI
-      objectReference: {fileID: 0}
-    - target: {fileID: 5815043059406311919, guid: f2ee63afad601ed4e9b9569c257af1bb, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5815043059653196639, guid: f2ee63afad601ed4e9b9569c257af1bb, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 11400000, guid: 18fa61328d61c324dac3d3339c0efca6, type: 2}
-    - target: {fileID: 5815043059653196639, guid: f2ee63afad601ed4e9b9569c257af1bb, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: RestartGame
-      objectReference: {fileID: 0}
-    - target: {fileID: 5815043059653196639, guid: f2ee63afad601ed4e9b9569c257af1bb, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: Hexagon.GameScene.SceneChanger, Assembly-CSharp
-      objectReference: {fileID: 0}
-    - target: {fileID: 7002137525576695985, guid: f2ee63afad601ed4e9b9569c257af1bb, type: 3}
-      propertyPath: _boardSettings
-      value: 
-      objectReference: {fileID: 11400000, guid: d6ce88b9803eb4c4ebfd5f4aaeac864f, type: 2}
-    - target: {fileID: 8986778932909720575, guid: f2ee63afad601ed4e9b9569c257af1bb, type: 3}
-      propertyPath: m_RootOrder
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f2ee63afad601ed4e9b9569c257af1bb, type: 3}

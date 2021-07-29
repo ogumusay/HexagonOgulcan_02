@@ -203,6 +203,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 267a1171a1ef22e40b75853d4069585a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _boardData: {fileID: 11400000, guid: 4685c063d4955c640854adb7325f7a0f, type: 2}
   _scoreText: {fileID: 5815043059406311913}
   _gameOverUI: {fileID: 5815043057709473666}
 --- !u!1 &5815043058295066261
@@ -633,8 +634,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: GameManagement, Assembly-CSharp
+      - m_Target: {fileID: 11400000, guid: 18fa61328d61c324dac3d3339c0efca6, type: 2}
+        m_TargetAssemblyTypeName: Hexagon.GameScene.SceneChanger, Assembly-CSharp
         m_MethodName: RestartGame
         m_Mode: 1
         m_Arguments:

@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e89990f05a9fdc244b9f5d282885da6b, type: 3}
-  m_Name: BoardSettings
+  m_Script: {fileID: 11500000, guid: a1736532e2419354d937f31607b8e7a2, type: 3}
+  m_Name: Board Data
   m_EditorClassIdentifier: 
   Row: 9
   Column: 8
-  StartDelay: 0.8
-  BombShowUpScore: 100
-  BombShowUpEveryScore: 100
+  StartDelay: 1
+  BombShowUpScore: 1000
+  BombShowUpEveryScore: 1000
   HexagonObjectPrefab: {fileID: 8471155379615840258, guid: a7aceb3ab538e4a4aaddbac5c8b43acc, type: 3}
   HexagonBombObjectPrefab: {fileID: 6237629015460650016, guid: 69e95ffffdd94a94d8c435e7d5133242, type: 3}
   Colors: 0000000001000000020000000300000004000000
